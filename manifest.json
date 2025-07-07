@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "AI Summarizer - Smart Text & Quiz Assistant",
+  "short_name": "AI Summarizer",
+  "version": "1.0.0",
+  "description": "AI-powered text summarization, Google Forms quiz solver, and intelligent text processing using Google Gemini API. Select text for instant summaries, explanations, and automated quiz answers.",
+  "author": "Karan Veer Thakur",
+  "homepage_url": "https://karanveerthakur.com.np",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Summarizer - Smart Text & Quiz Assistant",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

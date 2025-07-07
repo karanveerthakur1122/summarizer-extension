@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summarizer Extension</title>
+    <style>
+        body {
+            width: 350px;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            box-sizing: border-box;
+        }
+        
+        input[type="password"]:focus, input[type="text"]:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .instructions h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .developer-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .developer-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .developer-icon {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .developer-links {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .developer-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .developer-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .link-icon {
+            font-size: 14px;
+        }
+        
+        .usage-section {
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .usage-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: white;
+            cursor: help;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .usage-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .usage-icon {
+            font-size: 14px;
+        }
+        
+        .usage-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.4;
+            width: 300px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            text-align: left;
+        }
+        
+        .usage-button:hover .usage-tooltip {
+            display: block;
+        }
+        
+        .usage-tooltip h4 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: #4CAF50;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 4px;
+        }
+        
+        .usage-tooltip h4:not(:first-child) {
+            margin-top: 12px;
+        }
+        
+        .usage-tooltip ul {
+            margin: 0;
+            padding-left: 15px;
+        }
+        
+        .usage-tooltip li {
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        
+        .usage-tooltip strong {
+            color: #81C784;
+        }
+        
+        .api-key-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .api-key-info a {
+            color: #fff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📄 Summarizer</h1>
+        <p>AI-powered text summarization</p>
+    </div>
+    
+    <div class="api-key-info">
+        <strong>Get your API key:</strong> <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
+    </div>
+    
+    <form id="settingsForm">
+        <div class="form-group">
+            <label for="apiKey">Gemini API Key:</label>
+            <input type="password" id="apiKey" placeholder="Enter your Gemini API key" required>
+        </div>
+        
+        <button type="submit">Save Settings</button>
+    </form>
+    
+    <button id="testConnection">Test Connection</button>
+    
+    <div id="status" class="status" style="display: none;"></div>
+    
+    <div class="instructions">
+        <h3>How to use:</h3>
+        <ol>
+            <li>Enter your Gemini API key above</li>
+            <li>Select any text on a webpage</li>
+            <li>Click the "Summarize" button that appears</li>
+            <li>Optionally add context for better summaries</li>
+        </ol>
+    </div>
+    
+    <div class="developer-info">
+        <div class="developer-header">
+            <span class="developer-icon">&lt;/&gt;</span>
+            <span>About Developer</span>
+        </div>
+        <div class="developer-links">
+            <a href="https://github.com/karanveerthakur1122" target="_blank" class="developer-link">
+                <span class="link-icon">🐙</span>
+                GitHub Profile
+            </a>
+            <a href="https://karanveerthakur.com.np" target="_blank" class="developer-link">
+                <span class="link-icon">🌐</span>
+                Portfolio Website
+            </a>
+        </div>
+        <div class="usage-section">
+            <div class="usage-button" title="Detailed Usage Instructions">
+                <span class="usage-icon">📖</span>
+                Usage Guide
+                <div class="usage-tooltip">
+                    <h4>📄 Text Summarization:</h4>
+                    <ul>
+                        <li>Select any text on a webpage</li>
+                        <li>Click the small 📄 button that appears</li>
+                        <li>Choose from: Summarize, Fix Text, Explain Code, etc.</li>
+                        <li>Use "Replace Text" to replace selected text with AI result</li>
+                    </ul>
+                    
+                    <h4>🎓 Google Forms Quiz Mode:</h4>
+                    <ul>
+                        <li>Go to any Google Form</li>
+                        <li>Press <strong>Alt+S</strong> to toggle AI answers</li>
+                        <li>AI will analyze questions and provide answers</li>
+                        <li>Works with text and image-based questions</li>
+                        <li>Press Alt+S again to hide answers</li>
+                    </ul>
+                    
+                    <h4>⌨️ Keyboard Shortcuts:</h4>
+                    <ul>
+                        <li><strong>Alt+S</strong>: Quick summarize selected text</li>
+                        <li><strong>Alt+S</strong> on Google Forms: Toggle quiz answers</li>
+                        <li><strong>ESC</strong>: Close panels</li>
+                    </ul>
+                    
+                    <h4>🔒 Protected Content:</h4>
+                    <ul>
+                        <li>If direct replacement fails, content is copied to clipboard</li>
+                        <li>Manual paste required on protected pages</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

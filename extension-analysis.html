@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extension Flow Analysis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .flow-step {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .test-area {
+            background: #e9ecef;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px dashed #6c757d;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .warning { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Summarizer Extension Flow Analysis</h1>
+    
+    <div class="flow-step">
+        <h3>Step 1: Extension Loading</h3>
+        <p>Content script should inject into the page and register event listeners.</p>
+        <div id="step1-status" class="status pending">Checking...</div>
+        <div id="step1-details"></div>
+    </div>
+    
+    <div class="flow-step">
+        <h3>Step 2: Text Selection Detection</h3>
+        <p>When user selects text, the extension should detect it and show the summarize button.</p>
+        <div id="step2-status" class="status pending">Waiting for test...</div>
+        <div id="step2-details"></div>
+        <button onclick="testTextSelection()">Test Text Selection</button>
+    </div>
+    
+    <div class="flow-step">
+        <h3>Step 3: Button Interaction</h3>
+        <p>Clicking the summarize button should show the input panel.</p>
+        <div id="step3-status" class="status pending">Waiting for test...</div>
+        <div id="step3-details"></div>
+        <button onclick="testButtonInteraction()">Test Button Click</button>
+    </div>
+    
+    <div class="flow-step">
+        <h3>Step 4: API Communication</h3>
+        <p>Sending message to background script and receiving response.</p>
+        <div id="step4-status" class="status pending">Waiting for test...</div>
+        <div id="step4-details"></div>
+        <button onclick="testAPIComm()">Test API Communication</button>
+    </div>
+    
+    <div class="flow-step">
+        <h3>Step 5: Popup Display</h3>
+        <p>Showing the result popup with the AI response.</p>
+        <div id="step5-status" class="status pending">Waiting for test...</div>
+        <div id="step5-details"></div>
+        <button onclick="testPopupDisplay()">Test Popup Display</button>
+    </div>
+    
+    <div class="test-area">
+        <h3>📝 Test Text Area</h3>
+        <p>Select this text to test the extension: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>This is another paragraph for testing. The extension should detect when you select any part of this text and show the summarize button near your selection.</p>
+    </div>
+    
+    <div class="console-output" id="console-output">
+        <div>Console Output:</div>
+    </div>
+    
+    <button onclick="runFullTest()">🧪 Run Complete Test</button>
+    <button onclick="clearConsole()">🧹 Clear Console</button>
+    <button onclick="checkExtensionHealth()">🩺 Health Check</button>
+    
+    <script>
+        // Console output capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.innerHTML = `<span style="color: #666">[${timestamp}]</span> <span class="${type}">${message}</span>`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            addToConsole(args.join(' '), 'log');
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addToConsole(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            addToConsole(args.join(' '), 'warning');
+            originalWarn.apply(console, args);
+        };
+        
+        function clearConsole() {
+            consoleOutput.innerHTML = '<div>Console Output:</div>';
+        }
+        
+        function updateStatus(step, status, details = '') {
+            const statusEl = document.getElementById(`step${step}-status`);
+            const detailsEl = document.getElementById(`step${step}-details`);
+            
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = status === 'success' ? 'PASSED' : status === 'error' ? 'FAILED' : 'TESTING';
+            
+            if (details) {
+                detailsEl.innerHTML = `<small>${details}</small>`;
+            }
+        }
+        
+        // Step 1: Check extension loading
+        function checkExtensionLoading() {
+            console.log('🔍 Checking extension loading...');
+            updateStatus(1, 'pending');
+            
+            setTimeout(() => {
+                const loaded = typeof testDirectPopup === 'function';
+                const hasFunctions = window.debugSummarizer && window.testDirectPopup;
+                
+                if (loaded && hasFunctions) {
+                    updateStatus(1, 'success', 'Extension loaded successfully with all test functions');
+                    console.log('✅ Extension loaded and ready');
+                } else {
+                    updateStatus(1, 'error', 'Extension not detected or missing functions');
+                    console.error('❌ Extension not properly loaded');
+                }
+            }, 1000);
+        }
+        
+        // Step 2: Test text selection
+        function testTextSelection() {
+            console.log('🔍 Testing text selection...');
+            updateStatus(2, 'pending');
+            
+            const textElement = document.querySelector('.test-area p');
+            if (!textElement) {
+                updateStatus(2, 'error', 'Test element not found');
+                return;
+            }
+            
+            // Select text
+            const range = document.createRange();
+            range.selectNodeContents(textElement);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            console.log('Text selected:', selection.toString().substring(0, 50) + '...');
+            
+            // Trigger events
+            const events = ['mouseup', 'keyup'];
+            events.forEach(eventType => {
+                const event = new Event(eventType, { bubbles: true });
+                document.dispatchEvent(event);
+            });
+            
+            // Check for button after delay
+            setTimeout(() => {
+                const button = document.querySelector('.summarizer-button');
+                if (button) {
+                    updateStatus(2, 'success', 'Summarize button appeared after text selection');
+                    console.log('✅ Summarize button found');
+                } else {
+                    updateStatus(2, 'error', 'Summarize button did not appear');
+                    console.error('❌ No summarize button found');
+                }
+            }, 1000);
+        }
+        
+        // Step 3: Test button interaction
+        function testButtonInteraction() {
+            console.log('🔍 Testing button interaction...');
+            updateStatus(3, 'pending');
+            
+            // First ensure we have a button
+            testTextSelection();
+            
+            setTimeout(() => {
+                const button = document.querySelector('.summarizer-button');
+                if (button) {
+                    console.log('Clicking summarize button...');
+                    button.click();
+                    
+                    setTimeout(() => {
+                        const panel = document.querySelector('.summarizer-input-panel');
+                        if (panel) {
+                            updateStatus(3, 'success', 'Input panel appeared after button click');
+                            console.log('✅ Input panel found');
+                        } else {
+                            updateStatus(3, 'error', 'Input panel did not appear');
+                            console.error('❌ Input panel not found');
+                        }
+                    }, 500);
+                } else {
+                    updateStatus(3, 'error', 'No button available to test');
+                }
+            }, 1500);
+        }
+        
+        // Step 4: Test API communication
+        function testAPIComm() {
+            console.log('🔍 Testing API communication...');
+            updateStatus(4, 'pending');
+            
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                const testMessage = {
+                    action: 'summarize',
+                    mode: 'summarize',
+                    text: 'This is a test message for API communication.',
+                    context: ''
+                };
+                
+                chrome.runtime.sendMessage(testMessage, (response) => {
+                    if (chrome.runtime.lastError) {
+                        updateStatus(4, 'error', 'Chrome runtime error: ' + chrome.runtime.lastError.message);
+                        console.error('❌ Runtime error:', chrome.runtime.lastError);
+                    } else if (response) {
+                        updateStatus(4, 'success', 'Received response from background script');
+                        console.log('✅ API communication working, response:', response);
+                    } else {
+                        updateStatus(4, 'error', 'No response received');
+                        console.error('❌ No response from background script');
+                    }
+                });
+            } else {
+                updateStatus(4, 'error', 'Chrome extension APIs not available');
+                console.error('❌ Chrome APIs not available');
+            }
+        }
+        
+        // Step 5: Test popup display
+        function testPopupDisplay() {
+            console.log('🔍 Testing popup display...');
+            updateStatus(5, 'pending');
+            
+            if (typeof testDirectPopup === 'function') {
+                testDirectPopup();
+                
+                setTimeout(() => {
+                    const popup = document.querySelector('.summarizer-result-popup');
+                    if (popup) {
+                        const styles = window.getComputedStyle(popup);
+                        const isVisible = styles.opacity > 0 && styles.visibility === 'visible';
+                        
+                        if (isVisible) {
+                            updateStatus(5, 'success', 'Popup is visible and properly styled');
+                            console.log('✅ Popup displayed successfully');
+                        } else {
+                            updateStatus(5, 'error', 'Popup exists but not visible (opacity/visibility issue)');
+                            console.error('❌ Popup styling issue');
+                        }
+                    } else {
+                        updateStatus(5, 'error', 'Popup element not found in DOM');
+                        console.error('❌ Popup not created');
+                    }
+                }, 1000);
+            } else {
+                updateStatus(5, 'error', 'testDirectPopup function not available');
+                console.error('❌ Test function not available');
+            }
+        }
+        
+        // Run complete test
+        function runFullTest() {
+            console.log('🧪 Starting complete extension test...');
+            
+            checkExtensionLoading();
+            setTimeout(() => testTextSelection(), 2000);
+            setTimeout(() => testButtonInteraction(), 4000);
+            setTimeout(() => testAPIComm(), 6000);
+            setTimeout(() => testPopupDisplay(), 8000);
+            
+            setTimeout(() => {
+                console.log('🏁 Complete test finished');
+            }, 10000);
+        }
+        
+        // Health check
+        function checkExtensionHealth() {
+            console.log('🩺 Running extension health check...');
+            
+            const checks = {
+                'Extension Functions': typeof testDirectPopup === 'function',
+                'Chrome APIs': typeof chrome !== 'undefined',
+                'Runtime API': typeof chrome?.runtime?.sendMessage === 'function',
+                'DOM Ready': document.readyState === 'complete',
+                'Console Functions': typeof console.log === 'function'
+            };
+            
+            Object.entries(checks).forEach(([check, passed]) => {
+                console.log(`${passed ? '✅' : '❌'} ${check}: ${passed ? 'OK' : 'FAIL'}`);
+            });
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            console.log('🚀 Extension analysis page loaded');
+            checkExtensionLoading();
+        });
+        
+    </script>
+</body>
+</html>

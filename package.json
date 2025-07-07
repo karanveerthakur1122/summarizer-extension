@@ -1,0 +1,40 @@
+{
+  "name": "ai-summarizer-extension",
+  "version": "1.0.0",
+  "description": "AI-powered Chrome extension for text summarization and Google Forms quiz solving using Google Gemini API",
+  "author": {
+    "name": "Karan Veer Thakur",
+    "url": "https://karanveerthakur.com.np"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chrome-extension",
+    "ai",
+    "summarization",
+    "google-forms",
+    "quiz-solver",
+    "gemini-api",
+    "text-processing",
+    "productivity",
+    "browser-extension"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/karanveerthakur1122/summarizer-extension"
+  },
+  "homepage": "https://github.com/karanveerthakur1122/summarizer-extension#readme",
+  "bugs": {
+    "url": "https://github.com/karanveerthakur1122/summarizer-extension/issues"
+  },
+  "scripts": {
+    "build": "echo 'Creating production build...' && powershell -Command \"Compress-Archive -Path .\\* -DestinationPath 'ai-summarizer-extension.zip' -Exclude '*.git*','test-*','debug.*','node_modules','*.md','package*.json'\"",
+    "dev": "echo 'Load extension in Chrome developer mode from this directory'",
+    "test": "echo 'No automated tests - manual testing required'"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 88"
+  ]
+}
